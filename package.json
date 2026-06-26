@@ -1,0 +1,16 @@
+{
+  "name": "fiducia-ui",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "sync": "npm run build && rm -rf ../fiducia-backend.rs/static && cp -r dist ../fiducia-backend.rs/static"
+  },
+  "dependencies": {
+    "astro": "^7.0.3"
+  }
+}
