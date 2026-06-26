@@ -78,20 +78,20 @@ const services = [
 
 const steps = [
   {
-    title: 'Replicated log',
-    body: 'Every lock, counter, and schedule is an entry in a Raft-replicated log committed across a quorum of nodes.',
+    title: 'Sharded log',
+    body: 'The keyspace is split into shards, and each shard is its own Raft group. Every lock, key, or schedule is an entry in its shard’s replicated log.',
   },
   {
-    title: 'Leader election',
-    body: 'A single elected leader sequences writes. If it fails, a new leader is elected in milliseconds and serving continues.',
+    title: 'A leader per shard',
+    body: 'Each shard elects its own leader, so leadership — and write throughput — spreads across the whole cluster instead of funneling through one node.',
   },
   {
     title: 'Quorum commit',
-    body: 'An operation is acknowledged only once a majority has durably stored it — so a committed lock or job survives node loss.',
+    body: 'An operation is acknowledged only once a majority of its shard has durably stored it — so a committed lock or job survives node loss.',
   },
   {
-    title: 'Linearizable reads',
-    body: 'Reads go through the leader’s lease, giving you a single, consistent view of coordination state with no stale answers.',
+    title: 'A brain that scales it',
+    body: 'A control plane watches every node, re-places shards off failed ones, and adds or drains capacity automatically — the cluster heals and grows on its own.',
   },
 ];
 
