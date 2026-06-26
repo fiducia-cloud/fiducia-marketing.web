@@ -3,14 +3,14 @@ import Layout from '../layouts/Layout.astro';
 
 const services = [
   {
-    name: 'Mutual-Exclusion Locks',
+    name: 'Locks & Semaphores',
     tagline: 'Distributed locks you can trust',
-    desc: 'Fencing-token locks with automatic lease expiry. Exactly one holder across your whole fleet — no split brain, no stuck locks when a node dies.',
+    desc: 'Fencing-token mutexes with automatic lease expiry — exactly one holder across your whole fleet — plus counting semaphores when you need up to N concurrent holders.',
     points: [
+      'Mutex (one holder) or semaphore (N holders)',
       'Fencing tokens to defeat stale holders',
       'TTL leases with auto-release on crash',
-      'Blocking & try-lock acquire semantics',
-      'Fair, FIFO wait queues',
+      'Blocking & try-lock, fair FIFO queues',
     ],
     icon: 'lock',
   },
