@@ -153,10 +153,12 @@ const terminal = `<span class="tok-cmd">$</span> curl -X POST https://api.fiduci
           <span class="gradient-text">as a Service</span>
         </h1>
         <p class="hero__subtitle reveal d2">
-          Fiducia is a Raft-replicated control plane for distributed systems. Hand off the
-          hard parts of coordination — <strong>mutual-exclusion locks</strong>,
-          <strong>rate limiting</strong>, and <strong>cron</strong> — to an API that is
-          consistent, fault-tolerant, and always exactly one source of truth.
+          Fiducia is a Raft-replicated coordination layer for distributed systems — a managed
+          drop-in for the jobs you'd run ZooKeeper or etcd for. Hand off
+          <strong>locks</strong>, <strong>rate limiting</strong>, <strong>cron</strong>,
+          <strong>config KV with watches</strong>, <strong>leader election</strong>, and
+          <strong>service discovery</strong> to an API that is consistent, fault-tolerant, and
+          always exactly one source of truth.
         </p>
         <div class="hero__actions reveal d3">
           <a class="btn btn--primary" href="#start">
