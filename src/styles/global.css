@@ -239,6 +239,8 @@ a { color: inherit; text-decoration: none; }
 .reveal.d1 { animation-delay: .08s; }
 .reveal.d2 { animation-delay: .16s; }
 .reveal.d3 { animation-delay: .24s; }
+.reveal.d4 { animation-delay: .32s; }
+.reveal.d5 { animation-delay: .40s; }
 @keyframes rise { to { opacity: 1; transform: none; } }
 
 @media (max-width: 880px) {

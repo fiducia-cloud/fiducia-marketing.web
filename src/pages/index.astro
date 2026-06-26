@@ -38,24 +38,60 @@ const services = [
     ],
     icon: 'clock',
   },
+  {
+    name: 'Config KV & Watches',
+    tagline: 'Live config, one source of truth',
+    desc: 'A linearizable, versioned key/value store for configuration and feature flags. Watch a key or prefix and get changes pushed the instant they commit — no polling, no drift.',
+    points: [
+      'Versioned keys with compare-and-swap',
+      'Watch streams for keys & prefixes',
+      'TTL keys with automatic expiry',
+      'A consistent read, every node',
+    ],
+    icon: 'kv',
+  },
+  {
+    name: 'Leader Election',
+    tagline: 'Exactly one active worker',
+    desc: 'Run your own elections on top of Fiducia. Campaign for a named leadership, hold it with a TTL lease, and step down cleanly — with a fencing token to defeat the stale leader you forgot about.',
+    points: [
+      'Campaign, renew & resign semantics',
+      'Fencing tokens against stale leaders',
+      'Lease auto-release on crash',
+      'Observe & watch leadership changes',
+    ],
+    icon: 'flag',
+  },
+  {
+    name: 'Service Discovery',
+    tagline: 'A registry that tells the truth',
+    desc: 'Register service instances with a heartbeat lease and look up only the ones that are actually alive. Crashed instances drop out on their own — no stale endpoints, no manual cleanup.',
+    points: [
+      'TTL-health register & heartbeat',
+      'Live instance lookup by service',
+      'Watch streams for add/remove events',
+      'Metadata & address per instance',
+    ],
+    icon: 'compass',
+  },
 ];
 
 const steps = [
   {
-    title: 'Replicated log',
-    body: 'Every lock, counter, and schedule is an entry in a Raft-replicated log committed across a quorum of nodes.',
+    title: 'Sharded log',
+    body: 'The keyspace is split into shards, and each shard is its own Raft group. Every lock, key, or schedule is an entry in its shard’s replicated log.',
   },
   {
-    title: 'Leader election',
-    body: 'A single elected leader sequences writes. If it fails, a new leader is elected in milliseconds and serving continues.',
+    title: 'A leader per shard',
+    body: 'Each shard elects its own leader, so leadership — and write throughput — spreads across the whole cluster instead of funneling through one node.',
   },
   {
     title: 'Quorum commit',
-    body: 'An operation is acknowledged only once a majority has durably stored it — so a committed lock or job survives node loss.',
+    body: 'An operation is acknowledged only once a majority of its shard has durably stored it — so a committed lock or job survives node loss.',
   },
   {
-    title: 'Linearizable reads',
-    body: 'Reads go through the leader’s lease, giving you a single, consistent view of coordination state with no stale answers.',
+    title: 'A brain that scales it',
+    body: 'A control plane watches every node, re-places shards off failed ones, and adds or drains capacity automatically — the cluster heals and grows on its own.',
   },
 ];
 
@@ -117,10 +153,12 @@ const terminal = `<span class="tok-cmd">$</span> curl -X POST https://api.fiduci
           <span class="gradient-text">as a Service</span>
         </h1>
         <p class="hero__subtitle reveal d2">
-          Fiducia is a Raft-replicated control plane for distributed systems. Hand off the
-          hard parts of coordination — <strong>mutual-exclusion locks</strong>,
-          <strong>rate limiting</strong>, and <strong>cron</strong> — to an API that is
-          consistent, fault-tolerant, and always exactly one source of truth.
+          Fiducia is a Raft-replicated coordination layer for distributed systems — a managed
+          drop-in for the jobs you'd run ZooKeeper or etcd for. Hand off
+          <strong>locks</strong>, <strong>rate limiting</strong>, <strong>cron</strong>,
+          <strong>config KV with watches</strong>, <strong>leader election</strong>, and
+          <strong>service discovery</strong> to an API that is consistent, fault-tolerant, and
+          always exactly one source of truth.
         </p>
         <div class="hero__actions reveal d3">
           <a class="btn btn--primary" href="#start">
@@ -155,8 +193,9 @@ const terminal = `<span class="tok-cmd">$</span> curl -X POST https://api.fiduci
         <div class="section__head">
           <span class="badge">What Fiducia does</span>
           <h2>Coordination primitives,<br /><span class="gradient-text">delivered as an API</span></h2>
-          <p>Stop running your own ZooKeeper or etcd cluster. Fiducia gives you the three things
-            distributed systems fight over most — built on a single consistent core.</p>
+          <p>Stop running your own ZooKeeper or etcd cluster. Fiducia gives you the coordination
+            primitives distributed systems fight over most — locks, limits, schedules, config,
+            elections, and discovery — built on a single consistent core.</p>
         </div>
 
         <div class="grid-3">
@@ -171,6 +210,15 @@ const terminal = `<span class="tok-cmd">$</span> curl -X POST https://api.fiduci
                 )}
                 {s.icon === 'clock' && (
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="8.5" /><path d="M12 7.5V12l3 2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                )}
+                {s.icon === 'kv' && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><ellipse cx="12" cy="6" rx="7.5" ry="2.8" /><path d="M4.5 6v6c0 1.55 3.36 2.8 7.5 2.8s7.5-1.25 7.5-2.8V6" /><path d="M4.5 12v6c0 1.55 3.36 2.8 7.5 2.8s7.5-1.25 7.5-2.8v-6" /></svg>
+                )}
+                {s.icon === 'flag' && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 21V4" stroke-linecap="round" /><path d="M6 4.5h10l-2.2 3.5L16 11.5H6" stroke-linejoin="round" /></svg>
+                )}
+                {s.icon === 'compass' && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="8.5" /><path d="M15.5 8.5l-2 5-5 2 2-5z" stroke-linejoin="round" /><circle cx="12" cy="12" r="1.1" fill="currentColor" stroke="none" /></svg>
                 )}
               </div>
               <h3>{s.name}</h3>
@@ -189,9 +237,10 @@ const terminal = `<span class="tok-cmd">$</span> curl -X POST https://api.fiduci
       <div class="container">
         <div class="section__head">
           <span class="badge">Under the hood</span>
-          <h2>One <span class="gradient-text">Raft</span> core, every guarantee</h2>
-          <p>Every Fiducia operation is a committed entry in a replicated log. That is what turns
-            “probably locked” into “provably locked.”</p>
+          <h2>Many <span class="gradient-text">Raft</span> groups, one guarantee</h2>
+          <p>Every Fiducia operation is a committed entry in its shard’s replicated log. That is
+            what turns “probably locked” into “provably locked” — and what lets the cluster scale
+            out instead of up.</p>
         </div>
 
         <div class="raft">
@@ -209,9 +258,9 @@ const terminal = `<span class="tok-cmd">$</span> curl -X POST https://api.fiduci
 
           <div class="raft__card reveal d2">
             <div class="raft__metric"><span>Cluster</span><span>5 nodes · 3 AZ</span></div>
-            <div class="raft__metric"><span>Leader</span><span>node-2 · term 41</span></div>
+            <div class="raft__metric"><span>Shards</span><span>256 · RF 3</span></div>
+            <div class="raft__metric"><span>Leadership</span><span>node-2 · 52 shards</span></div>
             <div class="raft__metric"><span>Commit index</span><span>1,884,209</span></div>
-            <div class="raft__metric"><span>Quorum</span><span>3 / 5</span></div>
             <div class="raft__metric"><span>Active locks</span><span>12,704</span></div>
             <div class="raft__metric"><span>Failover</span><span>&lt; 250ms</span></div>
           </div>
