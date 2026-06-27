@@ -11,6 +11,7 @@
     "sync": "npm run build && node scripts/sync-static.mjs"
   },
   "dependencies": {
-    "astro": "^7.0.3"
+    "astro": "^7.0.3",
+    "@fiducia/interfaces": "file:../fiducia-interfaces"
   }
 }
