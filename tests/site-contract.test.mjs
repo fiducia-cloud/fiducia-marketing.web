@@ -22,6 +22,19 @@ test("landing page keeps every coordination primitive visible", () => {
   }
 });
 
+test("landing page speaks directly to AI-agent fleet coordination", () => {
+  assert.match(page, /AI-agent\s+fleets/);
+  for (const phrase of [
+    "AI agent coordination",
+    "Claim work once",
+    "Gate scarce tools",
+    "Elect supervisors",
+  ]) {
+    assert.ok(page.includes(phrase), `missing agent positioning: ${phrase}`);
+  }
+  assert.match(layout, /AI-agent fleets/);
+});
+
 test("primary calls to action remain internal and deploy-prefix safe", () => {
   assert.match(page, /href="#start"/);
   assert.match(page, /href="#services"/);

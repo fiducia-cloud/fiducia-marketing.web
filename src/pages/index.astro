@@ -95,6 +95,21 @@ const steps = [
   },
 ];
 
+const agentPatterns = [
+  {
+    title: 'Claim work once',
+    body: 'Use idempotency keys and TTL leases so many agents can race for the same task while only one commits the result.',
+  },
+  {
+    title: 'Gate scarce tools',
+    body: 'Put browser sessions, GPUs, paid APIs, inboxes, sandboxes, and deploy lanes behind semaphores and rate limits.',
+  },
+  {
+    title: 'Elect supervisors',
+    body: 'Run one planner, reviewer, compactor, or release coordinator at a time with leases, fencing tokens, and KV watches.',
+  },
+];
+
 // Base URL (e.g. "/fiducia/") for absolute in-app links so they survive the
 // gateway path prefix. Normalized to always end in exactly one slash.
 const base = import.meta.env.BASE_URL.replace(/\/+$/, '') + '/';
@@ -149,12 +164,12 @@ const terminal = `<span class="tok-cmd">$</span> curl -X POST https://api.fiduci
       <div class="container">
         <span class="badge reveal"><span class="badge__dot"></span>Raft-based · strongly consistent</span>
         <h1 class="hero__title reveal d1">
-          Consensus &amp; Coordination<br />
+          Coordination for Services<br />
           <span class="gradient-text">as a Service</span>
         </h1>
         <p class="hero__subtitle reveal d2">
-          Fiducia is a Raft-replicated control plane for distributed systems. Hand off the
-          hard parts of coordination — <strong>mutual-exclusion locks</strong>,
+          Fiducia is a Raft-replicated control plane for distributed systems and AI-agent
+          fleets. Hand off the hard parts of coordination — <strong>mutual-exclusion locks</strong>,
           <strong>semaphores</strong>, <strong>rate limiting</strong>,
           <strong>service discovery</strong>, <strong>elections</strong>, and
           <strong>cron</strong> — to an API that is consistent, fault-tolerant, and always
@@ -232,8 +247,30 @@ const terminal = `<span class="tok-cmd">$</span> curl -X POST https://api.fiduci
       </div>
     </section>
 
+    <!-- AI AGENTS -->
+    <section class="section" id="agents" style="background: rgba(10,16,36,0.4); border-block: 1px solid rgba(36,48,102,0.5);">
+      <div class="container">
+        <div class="section__head">
+          <span class="badge">AI agent coordination</span>
+          <h2>Keep agent fleets from<br /><span class="gradient-text">double-working the same world</span></h2>
+          <p>Agent platforms need the same correctness primitives as distributed databases: one
+            owner for a task, bounded concurrency for expensive tools, watched shared state, and
+            a durable answer to “who is in charge right now?”</p>
+        </div>
+
+        <div class="grid-3">
+          {agentPatterns.map((pattern, i) => (
+            <article class={`card reveal d${i}`}>
+              <h3>{pattern.title}</h3>
+              <p>{pattern.body}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
     <!-- HOW IT WORKS -->
-    <section class="section" id="how" style="background: rgba(10,16,36,0.4); border-block: 1px solid rgba(36,48,102,0.5);">
+    <section class="section" id="how">
       <div class="container">
         <div class="section__head">
           <span class="badge">Under the hood</span>
@@ -303,8 +340,8 @@ const terminal = `<span class="tok-cmd">$</span> curl -X POST https://api.fiduci
       <div class="container">
         <div class="cta reveal">
           <h2>Make coordination <span class="gradient-text">someone else’s problem</span></h2>
-          <p>Point your services at one endpoint and get locks, limits, and schedules backed by a
-            consensus you don’t have to operate.</p>
+          <p>Point your services or agent fleet at one endpoint and get locks, limits, task claims,
+            elections, KV watches, and schedules backed by a consensus you don’t have to operate.</p>
           <div class="hero__actions" style="margin-top:0;">
             <a class="btn btn--primary" href={`${base}api/info`}>View the API</a>
             <a class="btn btn--ghost" href="#services">Read the docs</a>
