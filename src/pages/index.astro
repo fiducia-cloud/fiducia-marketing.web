@@ -134,6 +134,7 @@ const terminal = `<span class="tok-cmd">$</span> curl -X POST https://api.fiduci
       </a>
       <div class="nav__links">
         <a class="nav__link" href="#services">Services</a>
+        <a class="nav__link" href="#agents">AI agents</a>
         <a class="nav__link" href="#how">How it works</a>
         <a class="nav__link" href="#why">Why Raft</a>
         <a class="btn btn--primary" href="#start">Get started</a>
@@ -153,9 +154,10 @@ const terminal = `<span class="tok-cmd">$</span> curl -X POST https://api.fiduci
           <span class="gradient-text">as a Service</span>
         </h1>
         <p class="hero__subtitle reveal d2">
-          Fiducia is a Raft-replicated control plane for distributed systems. Hand off the
-          hard parts of coordination — <strong>mutual-exclusion locks</strong>,
-          <strong>semaphores</strong>, <strong>rate limiting</strong>,
+          Fiducia is a Raft-replicated control plane for distributed systems and
+          <strong>AI agent fleets</strong>. Hand off the hard parts of coordination —
+          <strong>mutual-exclusion locks</strong>, <strong>semaphores</strong>,
+          <strong>rate limiting</strong>, <strong>shared state</strong>,
           <strong>service discovery</strong>, <strong>elections</strong>, and
           <strong>cron</strong> — to an API that is consistent, fault-tolerant, and always
           exactly one source of truth.
@@ -264,6 +266,68 @@ const terminal = `<span class="tok-cmd">$</span> curl -X POST https://api.fiduci
             <div class="raft__metric"><span>Active locks</span><span>12,704</span></div>
             <div class="raft__metric"><span>Failover</span><span>&lt; 250ms</span></div>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- AI AGENTS -->
+    <section class="section" id="agents">
+      <div class="container">
+        <div class="section__head">
+          <span class="badge">Built for AI agents</span>
+          <h2>Give your agent fleet<br /><span class="gradient-text">one source of truth</span></h2>
+          <p>Autonomous agents run in parallel, retry, crash, and fork — and the moment two of
+            them touch the same task, budget, or memory, you have a coordination problem.
+            Fiducia is the shared control plane that keeps a fleet of agents from stepping on
+            each other, built on the same consensus core.</p>
+        </div>
+
+        <div class="grid-3">
+          <article class="card reveal d0">
+            <div class="card__icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="7" width="16" height="12" rx="2" /><path d="M12 7V3.5" stroke-linecap="round" /><circle cx="12" cy="3" r="1.2" fill="currentColor" stroke="none" /><circle cx="9" cy="13" r="1.2" fill="currentColor" stroke="none" /><circle cx="15" cy="13" r="1.2" fill="currentColor" stroke="none" /></svg>
+            </div>
+            <h3>One agent per task</h3>
+            <p>Hand a job to a fleet and exactly one worker claims it. A fencing-token lock with a
+              TTL lease means a crashed or forked agent can’t double-book work — and a slow,
+              retried agent can’t clobber a newer one.</p>
+            <ul class="card__list">
+              <li>Idempotent task claims — no duplicate work or actions</li>
+              <li>Leases auto-release when an agent hangs or dies</li>
+              <li>Fencing tokens defeat a resurrected zombie agent</li>
+              <li>Leader election for a single planner / orchestrator</li>
+            </ul>
+          </article>
+          <article class="card reveal d1">
+            <div class="card__icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 18a8 8 0 1 1 16 0" /><path d="M12 18l4-5" stroke-linecap="round" /><circle cx="12" cy="18" r="1.3" fill="currentColor" stroke="none" /></svg>
+            </div>
+            <h3>Shared token &amp; tool budgets</h3>
+            <p>Parallel agents share one model provider, one set of tool APIs, one spend cap.
+              A single global limiter enforces LLM rate limits, per-tenant quotas, and cost
+              ceilings across the whole fleet — not per-replica, where they drift and overshoot.</p>
+            <ul class="card__list">
+              <li>Fleet-wide token-bucket for LLM &amp; tool rate limits</li>
+              <li>Atomic spend/quota check-and-decrement per tenant</li>
+              <li>Semaphores cap concurrent calls to a fragile tool</li>
+              <li>Back-pressure instead of 429 storms and overage bills</li>
+            </ul>
+          </article>
+          <article class="card reveal d2">
+            <div class="card__icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="6" cy="12" r="2.4" /><circle cx="18" cy="6" r="2.4" /><circle cx="18" cy="18" r="2.4" /><path d="M8.1 10.8 15.9 7.2M8.1 13.2 15.9 16.8" stroke-linecap="round" /></svg>
+            </div>
+            <h3>Shared memory &amp; handoff</h3>
+            <p>A linearizable KV blackboard lets agents publish state, coordinate hand-offs, and
+              read a consistent world model — with watches that push changes the instant they
+              commit. Register live agents and discover which are actually up.</p>
+            <ul class="card__list">
+              <li>Consistent blackboard / scratchpad every agent can trust</li>
+              <li>Watch streams for step results &amp; agent-to-agent hand-off</li>
+              <li>Compare-and-swap so two agents never clobber shared state</li>
+              <li>Service discovery: a live registry of agents &amp; tools</li>
+            </ul>
+          </article>
         </div>
       </div>
     </section>
