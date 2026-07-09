@@ -12,17 +12,17 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           path: repo
       # GitHub Actions checks out one repo in isolation, but npm ci needs the
       # sibling `file:../` deps (@fiducia/interfaces, @fiducia/test-config) present
       # alongside so `../fiducia-interfaces` etc. resolve.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           repository: fiducia-cloud/fiducia-interfaces
           path: fiducia-interfaces
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           repository: fiducia-cloud/fiducia-test-config
           path: fiducia-test-config
@@ -44,14 +44,14 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           path: repo
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           repository: fiducia-cloud/fiducia-interfaces
           path: fiducia-interfaces
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           repository: fiducia-cloud/fiducia-test-config
           path: fiducia-test-config
