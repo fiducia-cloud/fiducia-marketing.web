@@ -1,3 +1,4 @@
+# Nix flake defining the reproducible Fiducia dev shell (Rust + Node toolchains).
 {
   description = "Fiducia development environment";
 
