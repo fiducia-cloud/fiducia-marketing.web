@@ -1,5 +1,5 @@
 # CI: checks out the repo with its sibling file: deps, then runs contract tests
-# and the Astro build (gating), plus a best-effort browser E2E job.
+# and the Astro build, plus a browser E2E gate.
 name: ci
 on:
   push:
@@ -14,24 +14,26 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           path: repo
       # GitHub Actions checks out one repo in isolation, but npm ci needs the
       # sibling `file:../` deps (@fiducia/interfaces, @fiducia/test-config) present
       # alongside so `../fiducia-interfaces` etc. resolve.
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           repository: fiducia-cloud/fiducia-interfaces
+          ref: 487e470c45ab5851e8f6f3b1dc048fe067fbf408
           path: fiducia-interfaces
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           repository: fiducia-cloud/fiducia-test-config
+          ref: 825220281fdc16bbf47a035177001d2fe29bdabf
           path: fiducia-test-config
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version: "22"
-      - run: npm ci
+      - run: npm ci --ignore-scripts
         working-directory: repo
       # Node --test contract specs (site-contract.test.mjs).
       - run: npm test
@@ -40,31 +42,47 @@ jobs:
       - run: npm run build
         working-directory: repo
 
-  # Browser e2e (Playwright/Puppeteer) needs a real Chrome and the sibling
-  # @fiducia/test-config file: dependency, so it is best-effort only.
+  # Build the image from an isolated checkout so sibling file dependencies can
+  # never be satisfied accidentally by a developer's workspace layout.
+  container-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+      - name: build immutable marketing image
+        run: >-
+          docker build
+          --build-arg INTERFACES_REF=487e470c45ab5851e8f6f3b1dc048fe067fbf408
+          --build-arg TEST_CONFIG_REF=825220281fdc16bbf47a035177001d2fe29bdabf
+          --tag fiducia-marketing:ci .
+
+  # Browser e2e (Playwright/Puppeteer) uses a real Chrome and the pinned sibling
+  # @fiducia/test-config dependency. Failures block the change.
   browser-e2e:
     runs-on: ubuntu-latest
-    continue-on-error: true
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           path: repo
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           repository: fiducia-cloud/fiducia-interfaces
+          ref: 487e470c45ab5851e8f6f3b1dc048fe067fbf408
           path: fiducia-interfaces
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           repository: fiducia-cloud/fiducia-test-config
+          ref: 825220281fdc16bbf47a035177001d2fe29bdabf
           path: fiducia-test-config
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version: "22"
       - id: chrome
         # Third-party action: pinned to a full commit SHA (v2) so a moved tag
         # can't inject code; dependabot keeps the pin updated.
         uses: browser-actions/setup-chrome@2e1d749697dd1612b833dba4a722266286fbefcd # v2
-      - run: npm ci
+      - run: npm ci --ignore-scripts
         working-directory: repo
       - name: browser tests
         working-directory: repo

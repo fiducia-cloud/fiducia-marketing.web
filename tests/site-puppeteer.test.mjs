@@ -11,6 +11,7 @@ test("puppeteer renders the Fiducia marketing landing page and custom 404", asyn
   t.after(() => server.stop());
 
   const browser = await puppeteer.launch({
+    args: process.env.CI === "true" ? ["--no-sandbox", "--disable-setuid-sandbox"] : [],
     executablePath: chromeExecutablePath(),
     headless: "new",
   });
