@@ -30,6 +30,11 @@ The Rust backend (`../fiducia-backend.rs`) serves the built site. After changing
 anything here, run `npm run sync` and commit the regenerated `static/` in the
 backend repo.
 
+Everything in `public/` is copied verbatim into `dist/` and served, and every
+non-underscore-prefixed file in `src/pages/` becomes a live route — don't put
+anything in either place that shouldn't be published (directory intent docs in
+`src/pages/` are named `_README.md` for this reason).
+
 ## Security posture
 
 - **Fully static, no secrets in the bundle.** Output is static HTML/CSS/JS. The
