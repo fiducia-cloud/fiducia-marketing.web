@@ -40,11 +40,18 @@ anything in either place that shouldn't be published (directory intent docs in
 - **Fully static, no secrets in the bundle.** Output is static HTML/CSS/JS. The
   only build-time env is `PUBLIC_BASE` (a URL path prefix) — no API keys, tokens,
   or credentials are inlined. `npm audit --omit=dev` reports 0 vulnerabilities.
-- **No user data / no XSS sinks.** The marketing pages render only static,
-  author-controlled content; there is no `innerHTML`/`dangerouslySetInnerHTML`
-  and no request-derived interpolation.
-- **HTTP security headers are set by the serving layer.** CSP,
-  `X-Content-Type-Options: nosniff`, `X-Frame-Options`/`frame-ancestors`, and
-  `Referrer-Policy` are applied by `fiducia-backend.rs` in front of `dist/`. The
-  shell also carries `<meta name="referrer" content="strict-origin-when-cross-origin">`
+- **No user data / no request-derived XSS sinks.** The marketing pages render
+  only static, author-controlled content; there is no
+  `innerHTML`/`dangerouslySetInnerHTML` and no request-derived interpolation.
+  The single `set:html` (the hero terminal snippet in `src/pages/index.astro`)
+  renders a build-time string constant — keep it that way: never pass
+  request- or user-derived values to `set:html`.
+- **HTTP security headers are set by the serving layer.**
+  `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`,
+  `Referrer-Policy: strict-origin-when-cross-origin`, a permissions policy, and
+  a CSP are applied by `fiducia-backend.rs` in front of `dist/`. Note the CSP
+  is currently just `upgrade-insecure-requests` (no source restrictions) so the
+  backend's docs/diagram pages can load their CDN scripts — see the comment in
+  `fiducia-backend.rs/src/main.rs`. The shell also carries
+  `<meta name="referrer" content="strict-origin-when-cross-origin">`
   as defense-in-depth so full URLs don't leak to third-party origins.
