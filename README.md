@@ -20,11 +20,41 @@ homepage for Raft-based consensus & coordination as a service.
 ## Develop
 
 ```bash
-npm install
+npm ci
 npm run dev        # http://localhost:4321/fiducia/
 npm run build      # -> dist/
 npm run sync       # build + copy dist/ into ../fiducia-backend.rs/static/
 ```
+
+`npm ci` installs the exact dependency graph in `package-lock.json`. Its local
+packages are supplied as sibling repositories: `@fiducia/interfaces` at
+`bbd8b52ce729ec34b0a9bff4dda6d0a448181797` and `@fiducia/test-config` at
+`ed4c788abf3964482ae72a08b82fa3ac1d193f81`. CI checks out those full commits
+explicitly rather than following moving branches.
+
+## Container build
+
+The Docker builder fetches those same two public sibling repositories at the
+exact commits above, verifies their resolved HEADs, and then runs `npm ci` and
+the Astro production build. Build inputs are explicit and can be advanced only
+to other full commit IDs:
+
+```bash
+docker build \
+  --build-arg INTERFACES_REF=bbd8b52ce729ec34b0a9bff4dda6d0a448181797 \
+  --build-arg TEST_CONFIG_REF=ed4c788abf3964482ae72a08b82fa3ac1d193f81 \
+  --build-arg PUBLIC_BASE=/fiducia \
+  -t fiducia-ui .
+```
+
+`PUBLIC_BASE` is the only application build-time setting. The builder uses
+`node:24-slim`; the final `nginx:1.27-alpine` stage contains only the static
+`dist/` output and nginx configuration—no Git client, source checkout, Node
+toolchain, or sibling repositories. Nginx runs as its unprivileged `nginx` user,
+listens on port `8080`, writes temporary files only under `/tmp`, and adds
+baseline static-site security headers. When the gateway uses `/fiducia`, it
+must continue stripping that prefix before proxying to the container; use
+`PUBLIC_BASE=/` for root-hosted deployments.
 
 The Rust backend (`../fiducia-backend.rs`) serves the built site. `static/` is
 gitignored in the backend repo — deployment builds this site in-pod (node
@@ -52,9 +82,10 @@ anything in either place that shouldn't be published (directory intent docs in
 - **HTTP security headers are set by the serving layer.**
   `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`,
   `Referrer-Policy: strict-origin-when-cross-origin`, a permissions policy, and
-  a CSP are applied by `fiducia-backend.rs` in front of `dist/`. Note the CSP
-  is currently just `upgrade-insecure-requests` (no source restrictions) so the
-  backend's docs/diagram pages can load their CDN scripts — see the comment in
+  a CSP are applied by `fiducia-backend.rs` in front of `dist/`; the standalone
+  nginx image applies the first four headers directly. Note the backend CSP is
+  currently just `upgrade-insecure-requests` (no source restrictions) so its
+  docs/diagram pages can load their CDN scripts — see the comment in
   `fiducia-backend.rs/src/main.rs`. The shell also carries
   `<meta name="referrer" content="strict-origin-when-cross-origin">`
   as defense-in-depth so full URLs don't leak to third-party origins.
