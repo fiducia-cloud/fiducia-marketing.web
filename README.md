@@ -26,9 +26,12 @@ npm run build      # -> dist/
 npm run sync       # build + copy dist/ into ../fiducia-backend.rs/static/
 ```
 
-The Rust backend (`../fiducia-backend.rs`) serves the built site. After changing
-anything here, run `npm run sync` and commit the regenerated `static/` in the
-backend repo.
+The Rust backend (`../fiducia-backend.rs`) serves the built site. `static/` is
+gitignored in the backend repo — deployment builds this site in-pod (node
+initContainer) from this repo's main and hands it to the backend via
+`STATIC_DIR`, so nothing built is ever committed there. `npm run sync` only
+refreshes the local dev copy; run it after changing anything here so local
+serving matches source.
 
 Everything in `public/` is copied verbatim into `dist/` and served, and every
 non-underscore-prefixed file in `src/pages/` becomes a live route — don't put
