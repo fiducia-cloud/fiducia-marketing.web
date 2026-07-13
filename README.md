@@ -25,13 +25,14 @@ compiled into this Astro site.
 ## Develop
 
 ```bash
-npm ci
+npm ci --ignore-scripts
 npm run dev        # http://localhost:4321/fiducia/
 npm run build      # -> dist/
 npm run sync       # build + copy dist/ into ../fiducia-backend.rs/static/
 ```
 
-`npm ci` installs the exact dependency graph in `package-lock.json`. Its local
+`npm ci --ignore-scripts` installs the exact dependency graph in
+`package-lock.json` without running dependency lifecycle hooks. Its local
 packages are supplied as sibling repositories: `@fiducia/interfaces` at
 `bbd8b52ce729ec34b0a9bff4dda6d0a448181797` and `@fiducia/test-config` at
 `ed4c788abf3964482ae72a08b82fa3ac1d193f81`. CI checks out those full commits
@@ -40,9 +41,9 @@ explicitly rather than following moving branches.
 ## Container build
 
 The Docker builder fetches those same two public sibling repositories at the
-exact commits above, verifies their resolved HEADs, and then runs `npm ci` and
-the Astro production build. Build inputs are explicit and can be advanced only
-to other full commit IDs:
+exact commits above, verifies their resolved HEADs, and then runs
+`npm ci --ignore-scripts` and the Astro production build. Build inputs are
+explicit and can be advanced only to other full commit IDs:
 
 ```bash
 docker build \
