@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 # Static Astro site image.
-FROM node:24-slim AS build
+FROM node:24-slim@sha256:cb4e8f7c443347358b7875e717c29e27bf9befc8f5a26cf18af3c3dec80e58c5 AS build
 RUN apt-get update \
     && apt-get install -y --no-install-recommends ca-certificates git
 
@@ -31,7 +31,7 @@ COPY . .
 ARG PUBLIC_BASE=/fiducia
 RUN PUBLIC_BASE="$PUBLIC_BASE" npm run build
 
-FROM nginx:1.27-alpine
+FROM nginx:1.27-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY --from=build --chown=nginx:nginx /build/fiducia-ui.web/dist /srv/www
 USER nginx
