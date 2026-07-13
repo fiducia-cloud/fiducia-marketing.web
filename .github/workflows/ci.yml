@@ -23,7 +23,7 @@ jobs:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           repository: fiducia-cloud/fiducia-interfaces
-          ref: d6c2b02b862ca57ebdd46b5dbfd9433e164a7d50
+          ref: 5f2c5279ee19941024455b2843256872485bac82
           path: fiducia-interfaces
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
@@ -52,7 +52,7 @@ jobs:
       - name: build immutable marketing image
         run: >-
           docker build
-          --build-arg INTERFACES_REF=d6c2b02b862ca57ebdd46b5dbfd9433e164a7d50
+          --build-arg INTERFACES_REF=5f2c5279ee19941024455b2843256872485bac82
           --build-arg TEST_CONFIG_REF=825220281fdc16bbf47a035177001d2fe29bdabf
           --tag fiducia-ui:ci .
 
@@ -68,7 +68,7 @@ jobs:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           repository: fiducia-cloud/fiducia-interfaces
-          ref: d6c2b02b862ca57ebdd46b5dbfd9433e164a7d50
+          ref: 5f2c5279ee19941024455b2843256872485bac82
           path: fiducia-interfaces
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:

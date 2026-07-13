@@ -34,7 +34,7 @@ npm run sync       # build + copy dist/ into ../fiducia-backend.rs/static/
 `npm ci --ignore-scripts` installs the exact dependency graph in
 `package-lock.json` without running dependency lifecycle hooks. Its local
 packages are supplied as sibling repositories: `@fiducia/interfaces` at
-`d6c2b02b862ca57ebdd46b5dbfd9433e164a7d50` and `@fiducia/test-config` at
+`5f2c5279ee19941024455b2843256872485bac82` and `@fiducia/test-config` at
 `825220281fdc16bbf47a035177001d2fe29bdabf`. CI checks out those full commits
 explicitly rather than following moving branches.
 
@@ -47,7 +47,7 @@ explicit and can be advanced only to other full commit IDs:
 
 ```bash
 docker build \
-  --build-arg INTERFACES_REF=d6c2b02b862ca57ebdd46b5dbfd9433e164a7d50 \
+  --build-arg INTERFACES_REF=5f2c5279ee19941024455b2843256872485bac82 \
   --build-arg TEST_CONFIG_REF=825220281fdc16bbf47a035177001d2fe29bdabf \
   --build-arg PUBLIC_BASE=/fiducia \
   -t fiducia-ui .
