@@ -1,5 +1,4 @@
-# Marketing routes
+# pages
 
-Astro file-based routes for the public marketing site. Keep pages static,
-accessible, and marketing-only. Authenticated customer routes belong to
-`fiducia-customer.rs`; operator routes belong to `fiducia-admin.rs`.
+Astro file-based routes: each `.astro`/`.md` file here becomes a page at the
+matching URL path. Shared chrome belongs in `../layouts`, not per-page.

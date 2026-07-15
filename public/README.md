@@ -1,5 +1,5 @@
-# Public marketing assets
+# public
 
-Files in this directory are copied verbatim into the Astro marketing build and
-may be fetched publicly. Store only non-secret brand/static assets here; login,
-customer, and admin functionality belongs in their dedicated Rust services.
+Files copied verbatim into the site root at build time (favicons, CNAME,
+robots). No processing happens here — anything needing a build step belongs in
+`../src`.
