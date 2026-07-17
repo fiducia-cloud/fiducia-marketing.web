@@ -10,29 +10,41 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
+          persist-credentials: false
           path: repo
       # GitHub Actions checks out one repo in isolation, but npm ci needs the
       # sibling `file:../` deps (@fiducia/interfaces, @fiducia/test-config) present
       # alongside so `../fiducia-interfaces` etc. resolve.
+      - name: Validate GitHub Actions
+        uses: docker://rhysd/actionlint@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667
+        with:
+          args: repo/.github/workflows/ci.yml repo/.github/workflows/pages.yml
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
+          persist-credentials: false
           repository: fiducia-cloud/fiducia-interfaces
           ref: 487e470c45ab5851e8f6f3b1dc048fe067fbf408
           path: fiducia-interfaces
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
+          persist-credentials: false
           repository: fiducia-cloud/fiducia-test-config
           ref: 825220281fdc16bbf47a035177001d2fe29bdabf
           path: fiducia-test-config
-      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v6
         with:
-          node-version: "22"
+          node-version: "22.22.1"
       - run: npm ci --ignore-scripts
         working-directory: repo
       # Node --test contract specs (site-contract.test.mjs).
@@ -49,6 +61,8 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
       - name: build immutable marketing image
         run: >-
           docker build
@@ -64,20 +78,23 @@ jobs:
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
+          persist-credentials: false
           path: repo
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
+          persist-credentials: false
           repository: fiducia-cloud/fiducia-interfaces
           ref: 487e470c45ab5851e8f6f3b1dc048fe067fbf408
           path: fiducia-interfaces
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
+          persist-credentials: false
           repository: fiducia-cloud/fiducia-test-config
           ref: 825220281fdc16bbf47a035177001d2fe29bdabf
           path: fiducia-test-config
-      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v6
         with:
-          node-version: "22"
+          node-version: "22.22.1"
       - id: chrome
         # Third-party action: pinned to a full commit SHA (v2) so a moved tag
         # can't inject code; dependabot keeps the pin updated.
