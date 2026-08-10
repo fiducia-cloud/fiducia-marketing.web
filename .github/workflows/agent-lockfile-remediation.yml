@@ -1,0 +1,49 @@
+name: temporary lockfile remediation
+
+on:
+  push:
+    branches:
+      - agent/marketing-auth-header-20260810
+    paths:
+      - .github/workflows/agent-lockfile-remediation.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: lockfile-remediation-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  remediate:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout exact branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Regenerate and verify audited lockfile
+        run: |
+          set -euo pipefail
+          npm ci --ignore-scripts
+          npm audit fix --package-lock-only --ignore-scripts --no-fund
+          npm ci --ignore-scripts
+          npm audit --audit-level=high
+
+      - name: Commit lockfile and remove one-shot workflow
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm -- .github/workflows/agent-lockfile-remediation.yml
+          git add package-lock.json
+          git commit -m "chore(deps): refresh audited lockfile"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
