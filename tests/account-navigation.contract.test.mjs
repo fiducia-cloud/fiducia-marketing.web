@@ -12,7 +12,11 @@ test("every marketing page exposes the Fiducia customer account destinations", (
   assert.match(layoutSource, /href: `\$\{appOrigin\}\/login`/);
   assert.match(layoutSource, /href: `\$\{appOrigin\}\/app\/signup`/);
   assert.match(layoutSource, /href: `\$\{appOrigin\}\/app\/dashboard`/);
-  assert.match(layoutSource, /<nav class="account-bar" aria-label="Account">/);
+  assert.match(layoutSource, /<header class="account-bar">/);
+  assert.match(
+    layoutSource,
+    /class="account-bar__actions" role="navigation" aria-label="Account"/,
+  );
 
   for (const action of ["login", "signup", "dashboard"]) {
     assert.match(layoutSource, new RegExp(`action: '${action}'`));
