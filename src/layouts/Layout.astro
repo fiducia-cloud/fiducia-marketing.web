@@ -63,13 +63,13 @@ const accountLinks = [
     <meta property="og:url" content={canonicalUrl} />
   </head>
   <body>
-    <nav class="account-bar" aria-label="Account">
+    <header class="account-bar">
       <div class="account-bar__inner">
         <span class="account-bar__context">
           <span class="account-bar__status" aria-hidden="true"></span>
           Customer console
         </span>
-        <div class="account-bar__actions">
+        <div class="account-bar__actions" role="navigation" aria-label="Account">
           {accountLinks.map((link) => (
             <a
               class:list={[
@@ -84,7 +84,7 @@ const accountLinks = [
           ))}
         </div>
       </div>
-    </nav>
+    </header>
     <slot />
   </body>
 </html>
