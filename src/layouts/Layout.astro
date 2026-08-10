@@ -22,6 +22,16 @@ const isInvestorEvidence = title === 'Fiducia for investors and startup programs
 const canonicalPath = isInvestorEvidence ? investorPath : Astro.url.pathname;
 const canonicalUrl = new URL(canonicalPath, site).toString();
 const companyFactsUrl = new URL(`${base}company-facts.json`.replace(/\/{2,}/g, '/'), site).toString();
+
+// Authentication and account data terminate at the Rust customer web server.
+// The static marketing build contains only navigation URLs, never Supabase or
+// Shared Auth credentials.
+const appOrigin = 'https://app.fiducia.cloud';
+const accountLinks = [
+  { label: 'Log in', href: `${appOrigin}/login`, action: 'login', kind: 'quiet' },
+  { label: 'Sign up', href: `${appOrigin}/app/signup`, action: 'signup', kind: 'outline' },
+  { label: 'Dashboard', href: `${appOrigin}/app/dashboard`, action: 'dashboard', kind: 'primary' },
+];
 ---
 
 <!doctype html>
@@ -53,6 +63,168 @@ const companyFactsUrl = new URL(`${base}company-facts.json`.replace(/\/{2,}/g, '
     <meta property="og:url" content={canonicalUrl} />
   </head>
   <body>
+    <nav class="account-bar" aria-label="Account">
+      <div class="account-bar__inner">
+        <span class="account-bar__context">
+          <span class="account-bar__status" aria-hidden="true"></span>
+          Customer console
+        </span>
+        <div class="account-bar__actions">
+          {accountLinks.map((link) => (
+            <a
+              class:list={[
+                'account-bar__link',
+                `account-bar__link--${link.kind}`,
+              ]}
+              href={link.href}
+              data-account-action={link.action}
+            >
+              {link.label}
+            </a>
+          ))}
+        </div>
+      </div>
+    </nav>
     <slot />
   </body>
 </html>
+
+<style>
+  :global(:root) {
+    --fiducia-account-bar-height: 42px;
+  }
+
+  .account-bar {
+    position: sticky;
+    top: 0;
+    z-index: 70;
+    min-height: var(--fiducia-account-bar-height);
+    border-bottom: 1px solid rgba(36, 48, 102, 0.78);
+    background: rgba(5, 8, 20, 0.94);
+    backdrop-filter: saturate(1.25) blur(14px);
+  }
+
+  .account-bar__inner {
+    width: 100%;
+    max-width: var(--maxw);
+    min-height: var(--fiducia-account-bar-height);
+    margin-inline: auto;
+    padding-inline: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .account-bar__context {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    color: var(--text-faint);
+    font-size: .76rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .account-bar__status {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #34d399;
+    box-shadow: 0 0 12px rgba(52, 211, 153, .72);
+  }
+
+  .account-bar__actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: .45rem;
+  }
+
+  .account-bar__link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 30px;
+    padding: .34rem .72rem;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    color: var(--text-muted);
+    font-size: .8rem;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+    transition: color .15s ease, border-color .15s ease, background .15s ease, transform .15s ease;
+  }
+
+  .account-bar__link:hover {
+    color: var(--text);
+  }
+
+  .account-bar__link--outline {
+    border-color: rgba(192, 132, 252, .35);
+    background: rgba(168, 85, 247, .06);
+  }
+
+  .account-bar__link--outline:hover {
+    border-color: rgba(192, 132, 252, .7);
+    background: rgba(168, 85, 247, .12);
+  }
+
+  .account-bar__link--primary {
+    border-color: transparent;
+    background: var(--grad);
+    color: #0b0716;
+    box-shadow: 0 6px 18px rgba(147, 51, 234, .25);
+  }
+
+  .account-bar__link--primary:hover {
+    color: #0b0716;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(147, 51, 234, .4);
+  }
+
+  .account-bar__link:focus-visible {
+    outline: 3px solid rgba(192, 132, 252, .42);
+    outline-offset: 2px;
+  }
+
+  /* The product navigation remains sticky immediately below the account bar. */
+  :global(.nav) {
+    top: var(--fiducia-account-bar-height);
+  }
+
+  @media (max-width: 560px) {
+    :global(:root) {
+      --fiducia-account-bar-height: 46px;
+    }
+
+    .account-bar__inner {
+      padding-inline: .75rem;
+    }
+
+    .account-bar__context {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .account-bar__actions {
+      width: 100%;
+      justify-content: flex-end;
+    }
+
+    .account-bar__link {
+      padding-inline: .62rem;
+      font-size: .77rem;
+    }
+  }
+</style>
