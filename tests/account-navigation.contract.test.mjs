@@ -1,0 +1,26 @@
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import test from "node:test";
+
+const layoutSource = await readFile(
+  new URL("../src/layouts/Layout.astro", import.meta.url),
+  "utf8",
+);
+
+test("every marketing page exposes the Fiducia customer account destinations", () => {
+  assert.match(layoutSource, /const appOrigin = 'https:\/\/app\.fiducia\.cloud';/);
+  assert.match(layoutSource, /href: `\$\{appOrigin\}\/login`/);
+  assert.match(layoutSource, /href: `\$\{appOrigin\}\/app\/signup`/);
+  assert.match(layoutSource, /href: `\$\{appOrigin\}\/app\/dashboard`/);
+  assert.match(layoutSource, /<nav class="account-bar" aria-label="Account">/);
+
+  for (const action of ["login", "signup", "dashboard"]) {
+    assert.match(layoutSource, new RegExp(`action: '${action}'`));
+  }
+});
+
+test("the static Fiducia shell never embeds authentication secrets", () => {
+  assert.doesNotMatch(layoutSource, /SUPABASE_(?:SECRET|SERVICE_ROLE|ANON|PUBLISHABLE)_KEY/);
+  assert.doesNotMatch(layoutSource, /AUTH_BROWSER_.*SECRET/);
+  assert.doesNotMatch(layoutSource, /Bearer\s+[A-Za-z0-9._~-]+/);
+});
