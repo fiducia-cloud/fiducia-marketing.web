@@ -23,6 +23,11 @@ test("every marketing page exposes the Fiducia customer account destinations", (
   }
 });
 
+test("the account bar does not replace the page's primary nav landmark", () => {
+  assert.doesNotMatch(layoutSource, /<nav class="account-bar"/);
+  assert.match(layoutSource, /:global\(\.nav\) \{\s*top: var\(--fiducia-account-bar-height\);/);
+});
+
 test("the static Fiducia shell never embeds authentication secrets", () => {
   assert.doesNotMatch(layoutSource, /SUPABASE_(?:SECRET|SERVICE_ROLE|ANON|PUBLISHABLE)_KEY/);
   assert.doesNotMatch(layoutSource, /AUTH_BROWSER_.*SECRET/);
